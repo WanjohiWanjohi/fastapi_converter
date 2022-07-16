@@ -48,7 +48,7 @@ async def get_currencies(current_user: User = Depends(get_current_active_user), 
             raise HTTPException(status_code=404, detail=f"{e}")
 
 
-@app.get("/exchange/")
+@app.post("/exchange/")
 async def exchange(exchange_object: ExchangeObj = Body(), converter: Converter = Depends(Converter), token: str = Depends(oauth2_scheme)):
     """_summary_
     Returns:
@@ -58,10 +58,8 @@ async def exchange(exchange_object: ExchangeObj = Body(), converter: Converter =
         try:
             if exchange_object.date_of_exchange:
                 return converter.get_historical_rate(str(exchange_object.date_of_exchange), str(exchange_object.currency_from), exchange_object.currency_to.split(","))
-
-            conversion: Dict = converter.get_exchanged_value(
+            else:
+              return converter.get_exchanged_value(
                 exchange_object.currency_to, exchange_object.currency_from, str(exchange_object.amount_from))
-            conversion_rate = float(conversion)
-            return{}
         except Exception as e:
             raise HTTPException(status_code=404, detail=f"{e}")
