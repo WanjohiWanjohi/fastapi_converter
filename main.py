@@ -3,6 +3,7 @@ import requests
 from fastapi import Depends, Body, FastAPI
 from pydantic import Field, BaseModel, HttpUrl
 from typing import Union
+from converter import Converter
 
 class Item(BaseModel):
     name: str
@@ -20,11 +21,25 @@ class ExchangeObj(BaseModel):
     amount_to: Union[float, None, ] = None
     date_of_exchange: Union[str, None] = None
 
-
+#TODO: APi has two working endpoints
+    # 1: Lists all available currencies
+    # 2: The converter
+#TODO: Convert any available currency into other available currencies
+#TODO: Add authentication to the api 
 app = FastAPI()
 
-
+@app.get("/symbols")
+async def get_currencies(converter: Converter = Depends(Converter)):
+   #TODO: use proper error handling here
+    if converter:
+        try:
+            return converter.get_currencies()
+        except Exception as e:
+            return e
 @app.get("/exchange/")
 async def exchange(exchange_object: ExchangeObj = Body()):
+    pass
+@app.get("/exchange/{date}")
+async def exchange_historical(exchange_object: ExchangeObj = Body()):
     pass
 

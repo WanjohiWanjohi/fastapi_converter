@@ -17,6 +17,7 @@ class Converter():
         response = httpx.get(url, headers=headers)
         result = response.text
         return result
+    
     def get_currencies(self):
         """_summary_
 
@@ -31,6 +32,7 @@ class Converter():
         response = httpx.get(url, headers=headers)
         result = response.text
         return result
+    
     def get_historical_rate(self, url , date:str , symbols:List[str] , base:str):
         """_summary_
 
@@ -49,5 +51,3 @@ class Converter():
         status_code = response.status_code
         result = response.text
         return result
-convert = Converter()
-print(convert.get_currencies())
