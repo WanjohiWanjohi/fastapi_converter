@@ -33,7 +33,7 @@ class Converter():
         result = json.loads(response.text)
         return result
     
-    def get_historical_rate(self, url , date:str , base:str,  symbols:List[str]):
+    def get_historical_rate(self, date:str , base:str,  symbols:str):
         """_summary_
 
         Args:
@@ -48,6 +48,5 @@ class Converter():
         url = f"{self.base_url}/{date}?symbols={symbols}&base={base}"
         headers= {"apikey": self.api_key}
         response = httpx.get(url, headers=headers)
-        status_code = response.status_code
         result = json.loads(response.text)
         return result

@@ -1,4 +1,6 @@
+import json
 from re import A, I
+import re
 from fastapi import Depends, Body, FastAPI, HTTPException, status
 from pydantic import Field, BaseModel, HttpUrl
 from typing import Dict, List, Union
@@ -15,8 +17,7 @@ class ExchangeObj(BaseModel):
     exchange_rate: Union[float, None] = None
     amount_to: Union[float, None, ] = None
     date_of_exchange: Union[date, None] = None
-# TODO: APi has two working endpoints
-    # 2: The converter that converts any available currency into other available currencies
+
 # TODO: Use proper db for authentication (stretch goal)
 app = FastAPI()
 
@@ -59,7 +60,11 @@ async def exchange(exchange_object: ExchangeObj = Body(), converter: Converter =
             if exchange_object.date_of_exchange:
                 return converter.get_historical_rate(str(exchange_object.date_of_exchange), str(exchange_object.currency_from), exchange_object.currency_to.split(","))
             else:
-              return converter.get_exchanged_value(
-                exchange_object.currency_to, exchange_object.currency_from, str(exchange_object.amount_from))
+              result = converter.get_exchanged_value(exchange_object.currency_to, exchange_object.currency_from, str(exchange_object.amount_from))
+              json_result = json.loads(result)
+              exchange_object.exchange_rate = json_result["info"]["rate"]
+              exchange_object.amount_to = json_result["result"]
+              exchange_object.date_of_exchange = json_result["date"]              
+              return exchange_object
         except Exception as e:
             raise HTTPException(status_code=404, detail=f"{e}")
