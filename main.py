@@ -58,7 +58,9 @@ async def exchange(exchange_object: ExchangeObj = Body(), converter: Converter =
     if converter:
         try:
             if exchange_object.date_of_exchange:
-                return converter.get_historical_rate(str(exchange_object.date_of_exchange), str(exchange_object.currency_from), exchange_object.currency_to.split(","))
+                result = converter.get_historical_rate(str(exchange_object.date_of_exchange), str(exchange_object.currency_from), exchange_object.currency_to.split(","))
+                print(result)
+                return result
             else:
               result = converter.get_exchanged_value(exchange_object.currency_to, exchange_object.currency_from, str(exchange_object.amount_from))
               json_result = json.loads(result)
