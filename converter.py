@@ -10,9 +10,9 @@ class Converter():
         self.api_key = config('API_KEY')
 
     def get_exchanged_value(self , currency_to: str, currency_from: str, amount_from: float):
-        # TODO: use callback for this
-        # TODO: use dependency injection for this
+        """_summary_
         
+        """        
         url = f"{self.base_url}/convert?to={currency_to}&from={currency_from}&amount={amount_from}"
         headers = {"apikey": self.api_key}
         response = httpx.get(url, headers=headers)
