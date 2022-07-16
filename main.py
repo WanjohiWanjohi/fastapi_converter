@@ -1,45 +1,53 @@
-from re import I
-import requests
-from fastapi import Depends, Body, FastAPI
+from re import A, I
+from fastapi import Depends, Body, FastAPI, HTTPException
 from pydantic import Field, BaseModel, HttpUrl
-from typing import Union
+from typing import Dict, List, Union
+from datetime import date
 from converter import Converter
-
-class Item(BaseModel):
-    name: str
-    description: Union[str, None] = None
-    price: float = Field(
-        gt=0, description="The price must be greater than zero")
-    tax: Union[float, None] = None
+from fastapi.security import OAuth2PasswordBearer
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
 class ExchangeObj(BaseModel):
     currency_from: str
-    currency_to: str
+    currency_to: str = Field( description="The ")
     amount_from: float = Field(
-        gt=0, description="The excahnged amount from must be greater than zero")
+        gt=0, description="The exchanged amount from must be greater than zero")
     exchange_rate: Union[float, None] = None
     amount_to: Union[float, None, ] = None
-    date_of_exchange: Union[str, None] = None
+    date_of_exchange: Union[date, None] = None
 
-#TODO: APi has two working endpoints
-    # 1: Lists all available currencies
-    # 2: The converter
-#TODO: Convert any available currency into other available currencies
-#TODO: Add authentication to the api 
+
+# TODO: APi has two working endpoints
+    # 1: Lists all available currencies : Done
+    # 2: The converter that converts any available currency into other available currencies
+# TODO: Add authentication to the api
 app = FastAPI()
-
+all_currencies :List=[] 
 @app.get("/symbols")
 async def get_currencies(converter: Converter = Depends(Converter)):
-   #TODO: use proper error handling here
+    """_summary_
+    Returns:
+        json: with keys `success` and `symbols`, the latter key:value pairs
+    """
     if converter:
         try:
             return converter.get_currencies()
         except Exception as e:
-            return e
-@app.get("/exchange/")
-async def exchange(exchange_object: ExchangeObj = Body()):
-    pass
-@app.get("/exchange/{date}")
-async def exchange_historical(exchange_object: ExchangeObj = Body()):
-    pass
+            raise HTTPException(status_code=404, detail=f"{e}")
 
+@app.get("/exchange/")
+async def exchange(exchange_object: ExchangeObj = Body(), converter: Converter = Depends(Converter)):
+    """_summary_
+    Returns:
+        _type_: _description_
+    """
+    if converter:
+        try:
+            if exchange_object.date_of_exchange:
+                return converter.get_historical_rate(str(exchange_object.date_of_exchange), exchange_object.currency_from, exchange_object.currency_to.split(","))
+            
+            conversion :Dict= converter.get_exchanged_value(exchange_object.amount_to, exchange_object.currency_from, exchange_object.amount_from)
+            conversion_rate = float(conversion)
+            return{}
+        except Exception as e:
+            raise HTTPException(status_code=404, detail=f"{e}")

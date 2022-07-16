@@ -1,6 +1,7 @@
 from datetime import date
 from typing import List
 import httpx
+import json
 from decouple import config
 
 class Converter():
@@ -24,16 +25,15 @@ class Converter():
         Returns:
             _type_: _description_
         """
-        print(self.api_key)
         url = f"{self.base_url}/symbols"
         headers = {
             "apikey": self.api_key
         }        
         response = httpx.get(url, headers=headers)
-        result = response.text
+        result = json.loads(response.text)
         return result
     
-    def get_historical_rate(self, url , date:str , symbols:List[str] , base:str):
+    def get_historical_rate(self, url , date:str , base:str,  symbols:List[str]):
         """_summary_
 
         Args:
@@ -49,5 +49,5 @@ class Converter():
         headers= {"apikey": self.api_key}
         response = httpx.get(url, headers=headers)
         status_code = response.status_code
-        result = response.text
+        result = json.loads(response.text)
         return result
