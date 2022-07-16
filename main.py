@@ -14,8 +14,8 @@ class ExchangeObj(BaseModel):
     currency_to: str = Field(description="The ")
     amount_from: float = Field(
         gt=0, description="The exchanged amount from must be greater than zero")
-    exchange_rate: Union[float, None] = None
-    amount_to: Union[float, None, ] = None
+    exchange_rate: float = Field(1, hidden_from_schema=True)
+    amount_to: float = Field(1, hidden_from_schema=True)
     date_of_exchange: Union[date, None] = None
 
 # TODO: Use proper db for authentication (stretch goal)
@@ -52,14 +52,12 @@ async def get_currencies(current_user: User = Depends(get_current_active_user), 
 @app.post("/exchange/")
 async def exchange(exchange_object: ExchangeObj = Body(), converter: Converter = Depends(Converter), token: str = Depends(oauth2_scheme)):
     """_summary_
-    Returns:
-        _type_: _description_
+    To convert to multiple currencies  enter a comma seperated list of currencies e.g. KES,USD,EUR
     """
     if converter:
         try:
             if exchange_object.date_of_exchange:
-                result = converter.get_historical_rate(str(exchange_object.date_of_exchange), str(exchange_object.currency_from), exchange_object.currency_to.split(","))
-                print(result)
+                result = converter.get_historical_rate(str(exchange_object.date_of_exchange), str(exchange_object.currency_from), exchange_object.currency_to)
                 return result
             else:
               result = converter.get_exchanged_value(exchange_object.currency_to, exchange_object.currency_from, str(exchange_object.amount_from))

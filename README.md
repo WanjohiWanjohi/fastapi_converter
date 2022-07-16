@@ -2,7 +2,7 @@
 This is a simple implementation of an online currency exchanger.
 The application exposes two main endpoints:
     1. get_currencies [GET] : Takes no parameters and returns a list of currencies available
-    2. exchange[POST] : Takes a custom exchange object and returns a
+    2. exchange[POST] : Takes a custom exchange object and returns the exchange object with the conversion rates
  
 
  ### Running the application
@@ -14,7 +14,7 @@ The application exposes two main endpoints:
 - Run the application using the `uvicorn main:app --reload` command
 - Navigate to http://127.0.0.1:8000/docs to use the OPENAPI documentation to interact with the endpoints
 - Note: The api uses authentication . To login use the username: `johndoe` and the password: `secret2`
-
+- To get historical conversion rates for multiple currencies, pass in a comma seperated list of currencies
 
 ### Technologies Used
 - Python (FastAPI)
